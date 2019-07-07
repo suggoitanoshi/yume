@@ -7,29 +7,28 @@ class Money extends ChangeNotifier{
   Money(){
     if(_balance == null){
       SharedPreferences.getInstance().then((SharedPreferences prefs){
-        _balance = prefs.get('balance');
+        _balance = prefs.get('balance')??0;
         notifyListeners();
       });
     }
   }
-  void addMoney(num amount){
+  Future<void> addMoney(num amount) async {
     _balance += amount;
-    _setInPrefs();
+    await _setInPrefs();
     notifyListeners();
   }
-  void subMoney(num amount){
+  Future<void> subMoney(num amount) async {
     _balance -= amount;
-    _setInPrefs();
+    await _setInPrefs();
     notifyListeners();
   }
-  void setMoney(num balance){
+  Future<void> setMoney(num balance) async {
     _balance = balance;
-    _setInPrefs();
+    await _setInPrefs();
   }
 
-  void _setInPrefs(){
-    SharedPreferences.getInstance().then((SharedPreferences prefs){
-      prefs.setDouble('balance', balance);
-    });
+  Future<void> _setInPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('balance', balance.toDouble());
   }
 }

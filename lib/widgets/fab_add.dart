@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:orion/widgets/fullactivity_widget.dart';
+import 'package:orion/widgets/activityedit_widget.dart';
 
 class FloatingAdd extends StatelessWidget{
   @override

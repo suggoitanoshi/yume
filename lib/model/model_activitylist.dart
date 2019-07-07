@@ -3,7 +3,9 @@ import 'dart:collection';
 import 'package:flutter/widgets.dart';
 
 import 'package:orion/helper/database.dart';
-import 'package:orion/helper/money_activity.dart';
+import 'package:orion/model/money_activity.dart';
+
+import 'package:orion/helper/service_locator.dart';
 
 class ActivityListModel extends ChangeNotifier{
   bool _loaded = false;
@@ -18,15 +20,17 @@ class ActivityListModel extends ChangeNotifier{
   bool get loaded => _loaded;
   List<MoneyActivity> _activity = [];
   UnmodifiableListView<MoneyActivity> get allActivities => UnmodifiableListView(_activity);
+  DatabaseHandler dbHandler;
 
   ActivityListModel(){
+    dbHandler = locator<DatabaseHandler>();
     getActivities();
   }
 
-  void getActivities() async {
+  Future<void> getActivities() async {
     if(_loaded) return;
     _loading = true;
-    DatabaseHandler.dbHandler.getLatestNActivity(10).then((act){
+    dbHandler.getLatestNActivity(10).then((act){
       _loaded = true;
       _activity = act;
       _loading = false;
@@ -36,7 +40,7 @@ class ActivityListModel extends ChangeNotifier{
 
   Future<void> fetchMoreActivities() async {
     _loadingMore = true;
-    DatabaseHandler.dbHandler.getNActivityWithSkip(20, allActivities.length).then((List<MoneyActivity> fetched){
+    dbHandler.getNActivityWithSkip(20, allActivities.length).then((List<MoneyActivity> fetched){
       _loadingMore = false;
       if(fetched.length<20){
         _lastLoaded = true;
@@ -46,16 +50,25 @@ class ActivityListModel extends ChangeNotifier{
     });
   }
 
-  void addActivity(MoneyActivity act){
+  Future<void> addActivity(MoneyActivity act) async {
+    DatabaseHandler db = locator.get<DatabaseHandler>();
+    await db.addCategory(act.category);
+    int id = await db.addActivity(act);
+    act.id = id;
     _activity.add(act);
     _sortActivities();
   }
-  void updateActivity(MoneyActivity oldAct, MoneyActivity newAct){
+  Future<void> updateActivity(MoneyActivity oldAct, MoneyActivity newAct) async {
+    DatabaseHandler db = locator.get<DatabaseHandler>();
+    await db.updateActivity(oldAct, newAct);
     int index = _activity.indexOf(oldAct);
-    _activity[index].update(newAct);
+    newAct.key = oldAct.key;
+    _activity[index] = newAct;
     _sortActivities();
   }
-  void removeActivity(MoneyActivity act){
+  Future<void> removeActivity(MoneyActivity act) async {
+    DatabaseHandler db = locator.get<DatabaseHandler>();
+    await db.removeActivity(act);
     _activity.remove(act);
     notifyListeners();
   }

@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:orion/helper/database.dart';
 import 'package:orion/model/model_activitylist.dart';
 import 'package:orion/model/model_money.dart';
-import 'package:orion/helper/money_activity.dart';
+import 'package:orion/model/money_activity.dart';
 import 'package:orion/helper/util.dart';
+import 'package:orion/helper/service_locator.dart';
 
 import 'package:orion/widgets/fab_add.dart';
 import 'edit_activity.dart';
@@ -43,7 +44,7 @@ class FullActivityState extends State{
                     MoneyActivity currentItem = value.allActivities[i];
                     return Padding(
                       padding: EdgeInsets.all(10),
-                      child: IndividualActivityView(currentItem, key: Key(currentItem.time.toString())),
+                      child: IndividualActivityView(currentItem, key: currentItem.key),
                     );
                   }
                   else{
@@ -142,14 +143,9 @@ class IndividualActivityState extends State{
               else if(choice.val == 1){
                 num amount = _activity.amount;
                 bool income = _activity.income;
-                DatabaseHandler.dbHandler.removeActivity(_activity).then((v){
-                  if(income){
-                    Provider.of<Money>(context).subMoney(amount);
-                  }
-                  else{
-                    Provider.of<Money>(context).addMoney(amount);
-                  }
-                  Provider.of<ActivityListModel>(context).removeActivity(_activity);
+                Provider.of<ActivityListModel>(context).removeActivity(_activity).then((v){
+                  if(income) Provider.of<Money>(context).subMoney(amount);
+                  else Provider.of<Money>(context).addMoney(amount);
                 });
               }
             },

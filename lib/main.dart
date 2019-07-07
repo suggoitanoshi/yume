@@ -8,9 +8,11 @@ import 'package:orion/view/home.dart';
 import 'package:orion/view/initial_setup.dart';
 import 'package:orion/model/model_money.dart';
 import 'package:orion/model/model_activitylist.dart';
+import 'package:orion/helper/service_locator.dart';
 
 void main(){
   Intl.defaultLocale = 'id_ID';
+  setupLocator();
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
             body1: TextStyle(fontSize: 16.0),
           )
         ),
-        home: FirstScreenView(),
+        home: FirstScreenView()
       ),
     );
   }
@@ -46,14 +48,12 @@ class FirstScreenState extends State<FirstScreenView>{
   Future checkFirstSeen() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool _seen = prefs.getBool('hasRun')??false;
-    _seen = false;
     if(_seen){
       String name = prefs.getString('name');
       Provider.of<ActivityListModel>(context).getActivities();
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(name: name)));
     }
     else{
-      prefs.setBool('hasRun', true);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => Theme(
@@ -85,7 +85,7 @@ class FirstScreenState extends State<FirstScreenView>{
   @override
   void initState() {
     super.initState();
-    Timer(Duration(milliseconds: 500), (){
+    Timer(Duration(milliseconds: 100), (){
       checkFirstSeen();
     });
   }
@@ -93,9 +93,6 @@ class FirstScreenState extends State<FirstScreenView>{
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '',
-      theme: ThemeData(
-        primarySwatch: Colors.blue
-      ),
       home: Scaffold(
         backgroundColor: Colors.blue,
       ),

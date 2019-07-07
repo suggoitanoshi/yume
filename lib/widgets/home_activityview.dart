@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:orion/view/activity_full.dart';
 import 'package:orion/model/model_activitylist.dart';
 import 'package:orion/helper/util.dart';
+import 'package:orion/widgets/textwithicon.dart';
 
 class ActivitiesWidget extends StatefulWidget{
   @override

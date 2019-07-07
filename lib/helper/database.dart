@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:orion/helper/money_activity.dart';
+import 'package:orion/model/money_activity.dart';
 
 class DatabaseHandler{
-  DatabaseHandler._();
-  static final DatabaseHandler dbHandler = DatabaseHandler._();
   static Database _database;
   Future<Database> get database async{
     if(_database == null){

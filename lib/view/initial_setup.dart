@@ -22,6 +22,27 @@ class InitialSetupState extends State{
   TextEditingController _name = TextEditingController();
   TextEditingController _bal = TextEditingController();
 
+  Future<void> _finalizeSetup() async {
+    if(_name.text=='') return;
+    _setPrefs(_name.text);
+    num _balance = GlobalVars.currencyFormat.parse(_bal.text);
+    _setMoney(_balance);
+    _navigateToHome(_name.text, _balance);
+  }
+  Future<void> _setPrefs(String name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('name', name);
+    prefs.setBool('hasRun', true);
+  }
+  Future<void> _setMoney(num bal)async{
+    Provider.of<Money>(context).setMoney(bal);
+  }
+  _navigateToHome(String name, num bal){
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (BuildContext context) => Home(name: name, bal: bal),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,16 +96,7 @@ class InitialSetupState extends State{
               icon: Icon(Icons.arrow_forward, color: Theme.of(context).accentColor),
               iconSize: 48,
               tooltip: 'Finish Set Up!',
-              onPressed: () async {
-                if(_name.text == '') return;
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.setString('name', _name.text);
-                num balance = GlobalVars.currencyFormat.parse((_bal.text=='')?0:_bal.text);
-                Provider.of<Money>(context).setMoney(balance);
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (BuildContext context) => Home(name: _name.text, bal: balance),
-                ));
-              },
+              onPressed: _finalizeSetup,
             ),
           ],
         ),

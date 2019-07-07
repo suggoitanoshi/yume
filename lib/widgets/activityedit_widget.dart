@@ -8,8 +8,9 @@ import 'package:orion/helper/InputCurrencyFormatter.dart';
 import 'package:orion/helper/database.dart';
 import 'package:orion/model/model_money.dart';
 import 'package:orion/model/model_activitylist.dart';
-import 'package:orion/helper/money_activity.dart';
+import 'package:orion/model/money_activity.dart';
 import 'package:orion/helper/util.dart';
+import 'package:orion/helper/service_locator.dart';
 
 class CreateActivityView extends StatefulWidget{
   final MoneyActivity act;
@@ -281,34 +282,28 @@ class CreateActivityState extends State{
       Scaffold.of(context).showSnackBar(SnackBar(content: Text('Saving data')));
       num amount  = GlobalVars.currencyFormat.parse(_amount.text);
       MoneyActivity newAct = MoneyActivity(
-        amount,
-        _title.text,
-        _desc.text,
-        _category.text,
-        _pickedDate,
-        _isIncome
+        amount: amount,
+        title: _title.text,
+        desc: _desc.text,
+        category: _category.text,
+        time: _pickedDate,
+        income: _isIncome
       );
       if(_act != null){
         bool isInvert = (_act.income != newAct.income);
         num delta = (_act.amount - (isInvert?-amount:amount)).abs();
-        DatabaseHandler.dbHandler.updateActivity(_act, newAct).then((id){
-          if(_isIncome) Provider.of<Money>(context).addMoney(delta);
-          else Provider.of<Money>(context).subMoney(delta);
-          newAct.id = _act.id;
-          Provider.of<ActivityListModel>(context).updateActivity(_act, newAct);
-          _canPressDone = true;
-          Navigator.of(context).pop();
-        });
+        if(_isIncome) Provider.of<Money>(context).addMoney(delta);
+        else Provider.of<Money>(context).subMoney(delta);
+        newAct.id = _act.id;
+        Provider.of<ActivityListModel>(context).updateActivity(_act, newAct);
+        _canPressDone = true;
+        Navigator.of(context).pop();
       }
       else{
-        await DatabaseHandler.dbHandler.addCategory(_category.text);
-        DatabaseHandler.dbHandler.addActivity(newAct).then((newid){
-          newAct.id = newid;
-          if(_isIncome) Provider.of<Money>(context).addMoney(amount);
-          else Provider.of<Money>(context).subMoney(amount);
-          Provider.of<ActivityListModel>(context).addActivity(newAct);
-          Navigator.of(context).pop();
-        });
+        if(_isIncome) Provider.of<Money>(context).addMoney(amount);
+        else Provider.of<Money>(context).subMoney(amount);
+        Provider.of<ActivityListModel>(context).addActivity(newAct);
+        Navigator.of(context).pop();
       }
     }
     else{

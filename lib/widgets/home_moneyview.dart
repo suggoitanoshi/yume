@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:orion/model/model_money.dart';
 import 'package:orion/helper/util.dart';
+import 'package:orion/widgets/textwithicon.dart';
 
 class MoneyCard extends StatelessWidget{
   final double padding = GlobalVars.padding;
