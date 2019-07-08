@@ -1,16 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:orion/helper/database.dart';
+import 'package:orion/helper/service_locator.dart';
 import 'package:provider/provider.dart';
 
 import 'package:orion/helper/InputCurrencyFormatter.dart';
-import 'package:orion/helper/database.dart';
 import 'package:orion/model/model_money.dart';
 import 'package:orion/model/model_activitylist.dart';
 import 'package:orion/model/money_activity.dart';
 import 'package:orion/helper/util.dart';
-import 'package:orion/helper/service_locator.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CreateActivityView extends StatefulWidget{
   final MoneyActivity act;
@@ -20,6 +22,12 @@ class CreateActivityView extends StatefulWidget{
 }
 
 class CreateActivityState extends State{
+  static const Key doneKey = Key('done key');
+  static const Key balanceKey = Key('balance key');
+
+  static const Key incomeKey = Key('income key');
+  static const Key outcomeKey = Key('outcome key');
+
   MoneyActivity _act;
 
   TextEditingController _amount = TextEditingController();
@@ -102,6 +110,7 @@ class CreateActivityState extends State{
         padding: EdgeInsets.all(GlobalVars.padding),
         children: <Widget>[
           TextFormField(
+            key: balanceKey,
             controller: _amount,
             autofocus: true,
             validator: (value){
@@ -129,6 +138,7 @@ class CreateActivityState extends State{
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Radio(
+                key: incomeKey,
                 value: 0,
                 groupValue: _dirValue,
                 onChanged: _handleDirChange,
@@ -138,6 +148,7 @@ class CreateActivityState extends State{
                 child:  Text('Income'),
               ),
               Radio(
+                key: outcomeKey,
                 value: 1,
                 groupValue: _dirValue,
                 onChanged: _handleDirChange,
@@ -258,14 +269,28 @@ class CreateActivityState extends State{
             ),
             maxLines: null,
           ),
-          TextField(
-            controller: _category,
-            focusNode: _categoryNode,
-            decoration: InputDecoration(
-              labelText: 'Category'
-            )
+          TypeAheadField(
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: _category,
+              focusNode: _categoryNode,
+              decoration: InputDecoration(
+                labelText: 'Category'
+              ),
+            ),
+            suggestionsCallback: (pattern) async {
+              return await locator.get<DatabaseHandler>().getCategoryByPattern(pattern);
+            },
+            itemBuilder: (context, suggestion){
+              return ListTile(
+                title: Text(suggestion),
+              );
+            },
+            onSuggestionSelected: (suggestion){
+              _category.text = suggestion;
+            },
           ),
           RaisedButton(
+            key: doneKey,
             child: Text('Done'),
             onPressed: _canPressDone?_handleSubmit:null,
           ),
@@ -292,17 +317,17 @@ class CreateActivityState extends State{
       if(_act != null){
         bool isInvert = (_act.income != newAct.income);
         num delta = (_act.amount - (isInvert?-amount:amount)).abs();
-        if(_isIncome) Provider.of<Money>(context).addMoney(delta);
-        else Provider.of<Money>(context).subMoney(delta);
+        if(_isIncome) await Provider.of<Money>(context).addMoney(delta);
+        else await Provider.of<Money>(context).subMoney(delta);
         newAct.id = _act.id;
-        Provider.of<ActivityListModel>(context).updateActivity(_act, newAct);
+        await Provider.of<ActivityListModel>(context).updateActivity(_act, newAct);
         _canPressDone = true;
         Navigator.of(context).pop();
       }
       else{
-        if(_isIncome) Provider.of<Money>(context).addMoney(amount);
-        else Provider.of<Money>(context).subMoney(amount);
-        Provider.of<ActivityListModel>(context).addActivity(newAct);
+        if(_isIncome) await Provider.of<Money>(context).addMoney(amount);
+        else await Provider.of<Money>(context).subMoney(amount);
+        await Provider.of<ActivityListModel>(context).addActivity(newAct);
         Navigator.of(context).pop();
       }
     }

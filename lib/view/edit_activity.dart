@@ -5,15 +5,15 @@ import 'package:orion/model/money_activity.dart';
 import 'package:orion/widgets/activityedit_widget.dart';
 
 class EditActivityScreen extends StatelessWidget{
-  final MoneyActivity _act;
-  EditActivityScreen(this._act);
+  final MoneyActivity act;
+  EditActivityScreen({this.act});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Activity'),
       ),
-      body: CreateActivityView(act: _act),
+      body: CreateActivityView(act: act),
     );
   }
 }

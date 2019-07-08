@@ -12,7 +12,7 @@ class MoneyActivity{
 
   Key key = UniqueKey();
 
-  MoneyActivity({this.amount, this.title, this.desc, this.category, this.time, this.income});
+  MoneyActivity({this.amount = 0, this.title = '', this.desc = '', this.category = '', this.time, this.income = true});
   MoneyActivity.fromMap(Map<String, dynamic> map){
     this.id = map['id'];
     this.time = DateTime.parse(map['time']);

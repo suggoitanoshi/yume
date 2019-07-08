@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orion/model/money_activity.dart';
 import 'package:provider/provider.dart';
 
 import 'package:orion/view/activity_full.dart';
@@ -12,6 +13,7 @@ class ActivitiesWidget extends StatefulWidget{
 }
 
 class ActivitiesState extends State{
+  static const Key moreButtonKey = Key('more button');
   @override
   Widget build(BuildContext context) {
     return Consumer<ActivityListModel>(
@@ -27,54 +29,13 @@ class ActivitiesState extends State{
         );
         List<Widget> actList = [];
         value.allActivities.take(10).forEach((act){
-          actList.add(Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        act.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textScaleFactor: 1.2,
-                      ),
-                      Text(GlobalVars.dateFormat.format(act.time)),
-                    ],
-                  )
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      (act.income?'+':'-')+' '+
-                      GlobalVars.currencyFormat.format(act.amount),
-                      style: TextStyle(
-                        color: act.income?Colors.green:Colors.red
-                      ),
-                    ),
-                    Text(
-                      act.category,
-                      style: TextStyle(
-                        color: Colors.black38,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
-          ));
+          actList.add(ActivityItem(act));
         });
         actList.add(
           SizedBox(
             width: double.infinity,
             child: FlatButton(
+              key: moreButtonKey,
               child: Text('More'),
               onPressed: (){
                 Provider.of<ActivityListModel>(context).fetchMoreActivities();
@@ -89,6 +50,57 @@ class ActivitiesState extends State{
           children: actList,
         );
       },
+    );
+  }
+}
+
+class ActivityItem extends StatelessWidget{
+  final MoneyActivity act;
+  ActivityItem(this.act);
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  act.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textScaleFactor: 1.2,
+                ),
+                Text(GlobalVars.dateFormat.format(act.time)),
+              ],
+            )
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                (act.income?'+':'-')+' '+
+                GlobalVars.currencyFormat.format(act.amount),
+                style: TextStyle(
+                  color: act.income?Colors.green:Colors.red
+                ),
+              ),
+              Text(
+                act.category,
+                style: TextStyle(
+                  color: Colors.black38,
+                ),
+              ),
+            ],
+          ),
+        ],
+      )
     );
   }
 }

@@ -14,7 +14,6 @@ class DatabaseHandler{
   }
 
   Future<Database> initDatabase() async {
-    // deleteDatabase(join(await getDatabasesPath(), 'moneyactivity_db.db'));
     return await openDatabase(
       join(await getDatabasesPath(), 'moneyactivity_db.db'),
       onCreate: (db, version)async{
@@ -89,7 +88,20 @@ class DatabaseHandler{
         return MoneyActivity.fromMap(maps[i]);
       });
   }
-  Future<List<MoneyActivity>> getActivityInCategory(String category) async{}
+  Future<List<MoneyActivity>> getActivityInCategory(String category) async{
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'activity',
+      orderBy: 'time DESC',
+      where: 'category = ?',
+      whereArgs: [category],
+    );
+    return List.generate(
+      maps.length, (i){
+        return MoneyActivity.fromMap(maps[i]);
+      }
+    );
+  }
   Future<void> addCategory(String category) async {
     final Database db = await database;
     await db.insert('categorylist', {'categoryname': category}, conflictAlgorithm: ConflictAlgorithm.abort);
@@ -97,6 +109,17 @@ class DatabaseHandler{
   Future<List<String>> listCategory() async{
     final Database db = await database;
     final List<Map<String, dynamic>> map = await db.query('categorylist');
+    return List.generate(map.length, (i){
+      return map[i]['categoryname'];
+    });
+  }
+  Future<List<String>> getCategoryByPattern(String pattern) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> map = await db.query(
+      'categorylist',
+      where: "categoryname LIKE ?",
+      whereArgs: ['%'+pattern+'%'],
+    );
     return List.generate(map.length, (i){
       return map[i]['categoryname'];
     });

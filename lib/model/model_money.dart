@@ -25,6 +25,7 @@ class Money extends ChangeNotifier{
   Future<void> setMoney(num balance) async {
     _balance = balance;
     await _setInPrefs();
+    notifyListeners();
   }
 
   Future<void> _setInPrefs() async {

@@ -55,7 +55,7 @@ class MoneyViewState extends State{
             ),
             Consumer<Money>(
               builder: (context, money, child) => Text(
-                GlobalVars.currencyFormat.format(bal??money.balance??0),
+                GlobalVars.currencyFormat.format(money.balance??bal??0),
                 style: Theme.of(context).textTheme.subtitle.copyWith(
                   color: Theme.of(context).accentColor,
                   fontWeight: FontWeight.w400

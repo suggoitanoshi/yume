@@ -1,4 +1,4 @@
-package com.example.yume;
+package me.suggoi.yume;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import 'package:orion/helper/database.dart';
 import 'package:orion/model/model_activitylist.dart';
 import 'package:orion/model/model_money.dart';
 import 'package:orion/model/money_activity.dart';
 import 'package:orion/helper/util.dart';
-import 'package:orion/helper/service_locator.dart';
 
 import 'package:orion/widgets/fab_add.dart';
 import 'edit_activity.dart';
@@ -137,13 +135,13 @@ class IndividualActivityState extends State{
             onSelected: (Choice choice){
               if(choice.val == 0){
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext contetx) => EditActivityScreen(_activity)
+                  builder: (BuildContext contetx) => EditActivityScreen(act: _activity)
                 ));
               }
               else if(choice.val == 1){
                 num amount = _activity.amount;
                 bool income = _activity.income;
-                Provider.of<ActivityListModel>(context).removeActivity(_activity).then((v){
+                Provider.of<ActivityListModel>(context).removeActivity(_activity).then((_){
                   if(income) Provider.of<Money>(context).subMoney(amount);
                   else Provider.of<Money>(context).addMoney(amount);
                 });

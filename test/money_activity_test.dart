@@ -59,17 +59,4 @@ main(){
       });
     });
   });
-  group('money_activity_list', (){
-    MoneyActivity act;
-    setUp((){
-      act = MoneyActivity(
-        amount: 0,
-        title: 'title',
-        desc: 'desc',
-        category: 'category',
-        time: DateTime(2019, 1, 1),
-        income: false,
-      );
-    });
-  });
 }
