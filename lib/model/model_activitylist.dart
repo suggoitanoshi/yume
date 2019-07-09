@@ -52,7 +52,7 @@ class ActivityListModel extends ChangeNotifier{
 
   Future<void> addActivity(MoneyActivity act) async {
     DatabaseHandler db = locator.get<DatabaseHandler>();
-    await db.addCategory(act.category);
+    if(act.category != '') await db.addCategory(act.category);
     int id = await db.addActivity(act);
     act.id = id;
     _activity.add(act);

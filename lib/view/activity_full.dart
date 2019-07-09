@@ -34,6 +34,7 @@ class FullActivityState extends State{
                 if(scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent+10){
                   Provider.of<ActivityListModel>(context).fetchMoreActivities();
                 }
+                return;
               },
               child: ListView.separated(
                 itemCount: value.allActivities.length+1,
@@ -57,6 +58,10 @@ class FullActivityState extends State{
                       );
                     }
                   }
+                  return FlatButton(
+                    child: Text('refresh'),
+                    onPressed: (){}
+                  );
                 },
                 separatorBuilder: (BuildContext context, int i) => Divider(height: 10),
               ),

@@ -18,7 +18,7 @@ class DatabaseHandler{
       join(await getDatabasesPath(), 'moneyactivity_db.db'),
       onCreate: (db, version)async{
         await db.execute(
-          "CREATE TABLE categorylist(categoryname STRING)"
+          "CREATE TABLE categorylist(categoryname STRING UNIQUE)"
         );
         await db.execute(
           "CREATE TABLE activity(id INTEGER PRIMARY KEY AUTOINCREMENT, amount INTEGER, time STRING, title STRING, desc STRING, isIncome BOOLEAN, category STRING, FOREIGN KEY (category) REFERENCES categorylist(categoryname))",
@@ -104,7 +104,12 @@ class DatabaseHandler{
   }
   Future<void> addCategory(String category) async {
     final Database db = await database;
-    await db.insert('categorylist', {'categoryname': category}, conflictAlgorithm: ConflictAlgorithm.abort);
+    try{
+      await db.insert('categorylist', {'categoryname': category}, conflictAlgorithm: ConflictAlgorithm.abort);
+    }
+    on DatabaseException catch(e){
+      if(e.isUniqueConstraintError()) return;
+    }
   }
   Future<List<String>> listCategory() async{
     final Database db = await database;
