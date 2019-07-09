@@ -5,11 +5,9 @@ import 'package:orion/helper/util.dart';
 class InputCurrencyFormatter extends TextInputFormatter{
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    int _oldSelectionEnd = oldValue.selection.end;
-    int _oldLen = oldValue.text.length;
-    int _newLen;
-    int _diff;
-    int _offset;
+    final int oldEnd = oldValue.selection.end;
+    final int oldLen = oldValue.text.length;
+    int offset;
 
     String formatted;
 
@@ -20,21 +18,15 @@ class InputCurrencyFormatter extends TextInputFormatter{
       formatted = GlobalVars.currencyFormat.format(
         GlobalVars.currencyFormat.parse(newValue.text)
       );
-      _offset = formatted.length - (
-        (GlobalVars.currencyFormat.decimalDigits == 0) ?
-          0 : GlobalVars.currencyFormat.decimalDigits + 1);
+      offset = GlobalVars.currencyFormat.currencySymbol.length+1;
     }
     else{
       formatted = GlobalVars.currencyFormat.format(GlobalVars.currencyFormat.parse(newValue.text));
     }
-    if(_offset == null){
-      _newLen = formatted.length;
-      _diff = _newLen - _oldLen;
-      _offset = _oldSelectionEnd + _diff;
-    }
+    offset ??= oldEnd + formatted.length - oldLen;
     return TextEditingValue(
       text: formatted,
-      selection: TextSelection.collapsed(offset: _offset),
+      selection: TextSelection.collapsed(offset: offset),
     );
   }
 }

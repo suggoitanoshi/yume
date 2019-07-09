@@ -18,9 +18,7 @@ import 'package:orion/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orion/widgets/home_activityview.dart';
 
-
 class MockNavigatorObserver extends Mock implements NavigatorObserver{}
-
 class MockMoneyModel extends Mock implements Money{}
 class MockActivityListModel extends Mock implements ActivityListModel{}
 class MockMoneyActivity extends Mock implements MoneyActivity{}
