@@ -12,7 +12,7 @@ import 'package:orion/model/model_money.dart';
 import 'package:orion/model/model_activitylist.dart';
 import 'package:orion/model/money_activity.dart';
 import 'package:orion/helper/util.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:orion/widgets/suggestions.dart';
 
 class CreateActivityView extends StatefulWidget{
   final MoneyActivity act;
@@ -75,15 +75,6 @@ class CreateActivityState extends State{
     _dateDay = TextEditingController(text: _pickedDate.day.toString());
   }
 
-  @override
-  void dispose(){
-    _amount.dispose();
-    _title.dispose();
-    _desc.dispose();
-    _category.dispose();
-    super.dispose();
-  }
-
   void _handleDirChange(int value){
     setState((){
       _dirValue = value;
@@ -112,9 +103,8 @@ class CreateActivityState extends State{
           TextFormField(
             key: balanceKey,
             controller: _amount,
-            autofocus: true,
             validator: (value){
-              return value.isEmpty?'Amount cannot be zero':null;
+              return (value.isEmpty||GlobalVars.currencyFormat.parse(value)==0)?'Amount cannot be zero':null;
             },
             decoration: InputDecoration(
               labelText: 'Amount',
@@ -122,6 +112,7 @@ class CreateActivityState extends State{
               prefix: Text(NumberFormat.simpleCurrency().currencySymbol)
             ),
             inputFormatters: <TextInputFormatter>[
+              WhitelistingTextInputFormatter.digitsOnly,
               InputCurrencyFormatter(),
             ],
             keyboardType: TextInputType.number,
@@ -269,24 +260,14 @@ class CreateActivityState extends State{
             ),
             maxLines: null,
           ),
-          TypeAheadField(
-            textFieldConfiguration: TextFieldConfiguration(
-              controller: _category,
-              focusNode: _categoryNode,
-              decoration: InputDecoration(
-                labelText: 'Category'
-              ),
+          TextSuggestion(
+            controller: _category,
+            decoration: InputDecoration(
+              labelText: 'Category'
             ),
-            suggestionsCallback: (pattern) async {
+            focusNode: _categoryNode,
+            suggestionCallback: (pattern) async {
               return await locator.get<DatabaseHandler>().getCategoryByPattern(pattern);
-            },
-            itemBuilder: (context, suggestion){
-              return ListTile(
-                title: Text(suggestion),
-              );
-            },
-            onSuggestionSelected: (suggestion){
-              _category.text = suggestion;
             },
           ),
           RaisedButton(
@@ -332,7 +313,7 @@ class CreateActivityState extends State{
       }
     }
     else{
-      _canPressDone = true;
+      setState((){_canPressDone = true;});
     }
   }
 }

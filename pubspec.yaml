@@ -31,7 +31,6 @@ dependencies:
   shared_preferences: ^0.4.2
   provider: ^3.0.0
   get_it: ^1.0.3
-  flutter_typeahead: ^1.6.1
 
 dev_dependencies:
   mockito: ^4.1.0
